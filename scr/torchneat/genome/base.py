@@ -105,53 +105,44 @@ class GenomeBase:
     def execute_distance(self, state, nodes1, conns1, nodes2, conns2):
         return self.distance(state, self, nodes1, conns1, nodes2, conns2)
 
-    def initialize(self, state, randkey):
-        k1, k2 = torch.Generator().manual_seed(randkey).fork()  # k1 for nodes, k2 for conns
+    def initialize(self, randkey):
+        torch.manual_seed(randkey)  # Set random seed
 
         all_nodes_cnt = len(self.all_init_nodes)
         all_conns_cnt = len(self.all_init_conns)
 
-        # initialize nodes
-        nodes = jnp.full((self.max_nodes, self.node_gene.length), jnp.nan)
-        # create node indices
-        node_indices = self.all_init_nodes
-        # create node attrs
-        rand_keys_n = torch.Generator().manual_seed(k1).fork(num=all_nodes_cnt)
-        node_attr_func = vmap(self.node_gene.new_random_attrs, in_axes=(None, 0))
-        node_attrs = node_attr_func(state, rand_keys_n)
+        # Initialize nodes
+        nodes = torch.full((self.max_nodes, self.node_gene.length), float('nan'))
+        # Create node indices
+        node_indices = torch.tensor(self.all_init_nodes)
+        # Create node attrs
+        rand_keys_n = [torch.randint(0, 2**32, (1,)) for _ in range(all_nodes_cnt)]
+        node_attrs = torch.stack([self.node_gene.new_random_attrs(key) for key in rand_keys_n])
 
-        nodes = nodes.at[:all_nodes_cnt, 0].set(node_indices)  # set node indices
-        nodes = nodes.at[:all_nodes_cnt, 1:].set(node_attrs)  # set node attrs
+        nodes[:all_nodes_cnt, 0] = node_indices  # Set node indices
+        nodes[:all_nodes_cnt, 1:] = node_attrs  # Set node attrs
 
-        # initialize conns
-        conns = jnp.full((self.max_conns, self.conn_gene.length), jnp.nan)
-        # create input and output indices
-        conn_indices = self.all_init_conns
+        # Initialize connections
+        conns = torch.full((self.max_conns, self.conn_gene.length), float('nan'))
+        # Create input and output indices
+        conn_indices = torch.tensor(self.all_init_conns)
 
-        # create connection initial history markers
-        conn_markers = jnp.arange(all_conns_cnt)
+        # Create connection initial history markers
+        conn_markers = torch.arange(all_conns_cnt)
 
-        # create conn attrs
-        rand_keys_c = jax.random.split(k2, num=all_conns_cnt)
-        conns_attrs = jax.vmap(
-            self.conn_gene.new_random_attrs,
-            in_axes=(
-                None,
-                0,
-            ),
-        )(state, rand_keys_c)
+        # Create conn attrs
+        rand_keys_c = [torch.randint(0, 2**32, (1,)) for _ in range(all_conns_cnt)]
+        conns_attrs = torch.stack([self.conn_gene.new_random_attrs(key) for key in rand_keys_c])
 
-        # set conn indices
-        conns = conns.at[:all_conns_cnt, :2].set(conn_indices)
+        # Set conn indices
+        conns[:all_conns_cnt, :2] = conn_indices
 
-        # set conn history markers if needed
+        # Set conn history markers if needed
         if "historical_marker" in self.conn_gene.fixed_attrs:
-            conns = conns.at[:all_conns_cnt, 2].set(conn_markers)
+            conns[:all_conns_cnt, 2] = conn_markers
 
-        # set conn attrs
-        conns = conns.at[:all_conns_cnt, len(self.conn_gene.fixed_attrs) :].set(
-            conns_attrs
-        )
+        # Set conn attrs
+        conns[:all_conns_cnt, len(self.conn_gene.fixed_attrs):] = conns_attrs
 
         return nodes, conns
 
