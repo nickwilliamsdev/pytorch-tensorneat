@@ -113,35 +113,23 @@ class GenomeBase:
 
         # Initialize nodes
         nodes = torch.full((self.max_nodes, self.node_gene.length), float('nan'))
-        # Create node indices
         node_indices = torch.tensor(self.all_init_nodes)
-        # Create node attrs
         rand_keys_n = [torch.randint(0, 2**32, (1,)) for _ in range(all_nodes_cnt)]
         node_attrs = torch.stack([self.node_gene.new_random_attrs(state, key) for key in rand_keys_n])
 
-        nodes[:all_nodes_cnt, 0] = node_indices  # Set node indices
-        nodes[:all_nodes_cnt, 1:] = node_attrs  # Set node attrs
+        nodes[:all_nodes_cnt, 0] = node_indices
+        nodes[:all_nodes_cnt, 1:] = node_attrs
 
         # Initialize connections
         conns = torch.full((self.max_conns, self.conn_gene.length), float('nan'))
-        # Create input and output indices
         conn_indices = torch.tensor(self.all_init_conns)
-
-        # Create connection initial history markers
         conn_markers = torch.arange(all_conns_cnt)
-
-        # Create conn attrs
         rand_keys_c = [torch.randint(0, 2**32, (1,)) for _ in range(all_conns_cnt)]
         conns_attrs = torch.stack([self.conn_gene.new_random_attrs(state, key) for key in rand_keys_c])
 
-        # Set conn indices
         conns[:all_conns_cnt, :2] = conn_indices
-
-        # Set conn history markers if needed
         if "historical_marker" in self.conn_gene.fixed_attrs:
             conns[:all_conns_cnt, 2] = conn_markers
-
-        # Set conn attrs
         conns[:all_conns_cnt, len(self.conn_gene.fixed_attrs):] = conns_attrs
 
         return nodes, conns
