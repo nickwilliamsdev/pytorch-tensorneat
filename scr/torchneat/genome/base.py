@@ -105,7 +105,7 @@ class GenomeBase:
     def execute_distance(self, state, nodes1, conns1, nodes2, conns2):
         return self.distance(state, self, nodes1, conns1, nodes2, conns2)
 
-    def initialize(self, randkey):
+    def initialize(self, state, randkey):
         torch.manual_seed(randkey)  # Set random seed
 
         all_nodes_cnt = len(self.all_init_nodes)
@@ -117,7 +117,7 @@ class GenomeBase:
         node_indices = torch.tensor(self.all_init_nodes)
         # Create node attrs
         rand_keys_n = [torch.randint(0, 2**32, (1,)) for _ in range(all_nodes_cnt)]
-        node_attrs = torch.stack([self.node_gene.new_random_attrs(key) for key in rand_keys_n])
+        node_attrs = torch.stack([self.node_gene.new_random_attrs(state, key) for key in rand_keys_n])
 
         nodes[:all_nodes_cnt, 0] = node_indices  # Set node indices
         nodes[:all_nodes_cnt, 1:] = node_attrs  # Set node attrs
@@ -132,7 +132,7 @@ class GenomeBase:
 
         # Create conn attrs
         rand_keys_c = [torch.randint(0, 2**32, (1,)) for _ in range(all_conns_cnt)]
-        conns_attrs = torch.stack([self.conn_gene.new_random_attrs(key) for key in rand_keys_c])
+        conns_attrs = torch.stack([self.conn_gene.new_random_attrs(state, key) for key in rand_keys_c])
 
         # Set conn indices
         conns[:all_conns_cnt, :2] = conn_indices
