@@ -6,6 +6,13 @@ from functools import partial
 I_INF = torch.iinfo(torch.int32).max
 
 
+def split_generator(base_gen, num_splits):
+    """
+    Split a base torch.Generator into multiple independent generators.
+    """
+    seeds = torch.randint(0, 2**32, (num_splits,), generator=base_gen)
+    return [torch.Generator().manual_seed(seed.item()) for seed in seeds]
+
 def attach_with_inf(arr, idx):
     """
     Attach values from `arr` using indices `idx`, replacing unavailable indices (I_INF) with NaN.
