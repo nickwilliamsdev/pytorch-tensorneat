@@ -2,7 +2,7 @@ from typing import Optional, Union, Sequence, Callable
 from .base import BaseNode
 import torchneat.common.functions.act_torch as torchneat_act
 import torch
-from torchneat.common.tools import split_generator
+from torchneat.common.tools import split_generator, mutate_float
 
 class DefaultNode(BaseNode):
     "Default node gene, with the same behavior as in NEAT-python."
