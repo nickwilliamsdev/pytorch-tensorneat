@@ -61,12 +61,12 @@ class DefaultNode(BaseNode):
 
         self.aggregation_default = aggregation_options.index(aggregation_default)
         self.aggregation_options = aggregation_options
-        self.aggregation_indices = np.arange(len(aggregation_options))
+        self.aggregation_indices = torch.arange(len(aggregation_options))
         self.aggregation_replace_rate = aggregation_replace_rate
 
         self.activation_default = activation_options.index(activation_default)
         self.activation_options = activation_options
-        self.activation_indices = np.arange(len(activation_options))
+        self.activation_indices = torch.arange(len(activation_options))
         self.activation_replace_rate = activation_replace_rate
 
     def new_identity_attrs(self, state):
@@ -113,21 +113,21 @@ class DefaultNode(BaseNode):
             self.response_mutate_rate,
             self.response_replace_rate,
         )
-        res = jnp.clip(res, self.reponse_lower_bound, self.response_upper_bound)
+        res = torch.clip(res, self.reponse_lower_bound, self.response_upper_bound)
         agg = mutate_int(
             k4, agg, self.aggregation_indices, self.aggregation_replace_rate
         )
 
         act = mutate_int(k3, act, self.activation_indices, self.activation_replace_rate)
 
-        return jnp.array([bias, res, agg, act])
+        return torch.tensor([bias, res, agg, act])
 
     def distance(self, state, attrs1, attrs2):
         bias1, res1, agg1, act1 = attrs1
         bias2, res2, agg2, act2 = attrs2
         return (
-            jnp.abs(bias1 - bias2)  # bias
-            + jnp.abs(res1 - res2)  # response
+            torch.abs(bias1 - bias2)  # bias
+            + torch.abs(res1 - res2)  # response
             + (agg1 != agg2)  # aggregation
             + (act1 != act2)  # activation
         )
@@ -174,8 +174,8 @@ class DefaultNode(BaseNode):
         idx, bias, res, agg, act = node
 
         idx = int(idx)
-        bias = jnp.float32(bias)
-        res = jnp.float32(res)
+        bias = torch.float32(bias)
+        res = torch.float32(res)
         agg = int(agg)
         act = int(act)
 
