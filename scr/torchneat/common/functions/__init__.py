@@ -1,4 +1,5 @@
 from .act_torch import *
+from .manager import FunctionManager
 
 act_name2torch = {
     "scaled_sigmoid": scaled_sigmoid_,
@@ -14,3 +15,4 @@ act_name2torch = {
     "exp": exp_,
     "abs": abs_
 }
+ACT = FunctionManager(act_name2torch)
