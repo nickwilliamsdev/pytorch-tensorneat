@@ -1,4 +1,5 @@
 from .act_torch import *
+from .agg_torch import *
 from .manager import FunctionManager
 
 act_name2torch = {
@@ -14,5 +15,14 @@ act_name2torch = {
     "log": log_,
     "exp": exp_,
     "abs": abs_
+}
+
+agg_name2torch = {
+    "sum": sum_,
+    "product": product_,
+    "max": max_,
+    "min": min_,
+    "maxabs": maxabs_,
+    "mean": mean_
 }
 ACT = FunctionManager(act_name2torch)
