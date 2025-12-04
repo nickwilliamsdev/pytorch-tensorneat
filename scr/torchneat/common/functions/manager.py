@@ -46,17 +46,3 @@ class FunctionManager:
 
         else:
             raise ValueError(f"Func {func} need be a string or callable.")
-
-    def _obtain_sympy_by_name(self, name: str):
-        if name not in self.name2sympy:
-            raise ValueError(f"Func {name} doesn't have a sympy representation.")
-        return self.name2sympy[name]
-
-    def sympy_module(self):
-        backend = torch
-        module = {}
-        for sympy_cls in self.name2sympy.values():
-            if hasattr(sympy_cls, "numerical_eval"):
-                module[sympy_cls.__name__] = partial(sympy_cls.numerical_eval, backend)
-
-        return module
