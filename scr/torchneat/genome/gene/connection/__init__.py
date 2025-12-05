@@ -1,3 +1,3 @@
 from .base import BaseConn
 from .default import DefaultConn
-from .original import OriginConn
+from .original import OriginalConn
