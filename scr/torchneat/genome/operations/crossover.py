@@ -1,9 +1,9 @@
 import torch
 from torch import Tensor
 from typing import Tuple
-from tensorneat.common import fetch_first, I_INF
-from tensorneat.genome.gene import BaseGene
-from tensorneat.utils import extract_gene_attrs, set_gene_attrs
+from torchneat.common import fetch_first, I_INF
+from torchneat.genome.gene import BaseGene
+from torchneat.genome.utils import extract_gene_attrs, set_gene_attrs
 
 
 def default_crossover(
