@@ -1,0 +1,17 @@
+import torch
+
+class SpeciesController(object):
+    def __init__(
+        self,
+        pop_size,
+        species_size,
+        max_stagnation,
+        species_elitism,
+        spawn_number_change_rate,
+        genome_elitism,
+        survival_threshold,
+        min_species_size,
+        compatibility_threshold,
+        species_fitness_func,
+        species_number_calculate_by,
+    ):
